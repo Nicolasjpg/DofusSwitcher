@@ -1,8 +1,8 @@
 # DofusSwitcher
 
-**DofusSwitcher** es una app para windows que permite manejar las ventanas para multicuenta en Dofus Unity (funciona con retro pero fue diseñada pensando solamente en unity)
+**DofusSwitcher** es una app para windows que permite manejar las ventanas para multicuenta en Dofus Unity (funciona con retro pero fue diseñada pensando solamente en unity), detecta automaticamente las ventanas de Dofus abiertas
 
-Desarrollado en **Rust** 🦀 utilizando `egui` y la API nativa de Windows para garantizar un consumo de recursos mínimo (CPU/RAM).
+Desarrollado en **Rust** utilizando `egui` y la API nativa de Windows para garantizar un consumo de recursos mínimo (CPU/RAM).
 
 ## Características Principales
 
@@ -14,19 +14,49 @@ Desarrollado en **Rust** 🦀 utilizando `egui` y la API nativa de Windows para 
     * Se puede usar en modo **Vertical** u **Horizontal**.
 * **Portabilidad:** Ejecutable único con icono embebido.
 
-## 📥 Instalación y Uso
+## Instalación y Uso
 
-1.  Descarga la última versión desde la sección de **Releases**.
-2.  Descomprime el archivo `.zip` en una carpeta (Ej: `Mis Documentos/DofusSwitcher`).
-3.  Asegúrate de que la carpeta `icons` esté junto al ejecutable.
-4.  Ejecuta `DofusSwitcher.exe`.
+### Requisitos Previos
+* Sistema Operativo: **Windows 10 o 11**
+### Pasos
+1.  Ve a la sección de **[Releases](../../releases)** de este repositorio.
+2.  Descargue el archivo `.zip` de la última versión (ej: `DofusSwitcher_v1.0.zip`).
+3.  Descomprima el archivo
+4.  **IMPORTANTE:** ]Asegurar que la carpeta `icons` esté junto al ejecutable.
 
-### Estructura de Carpetas recomendada:
+### Estructura Correcta de la Carpeta
+Para que los iconos funcionen, lacarpeta debe verse así:
+
 ```text
-📂 MiCarpeta/
- ├── 📄 DofusSwitcher.exe
- ├── 📄 dofus_config.json  (Se crea solo al guardar cambios)
- └── 📂 icons/             (Tus imágenes .png para los personajes)
+📂 DofusSwitcher/
+ │
+ ├── ⚙️ DofusSwitcher.exe      <-- El programa principal
+ ├── 📄 dofus_config.json      <-- (Se crea automáticamente al guardar)
+ │
+ └── 📂 icons/                 <-- Carpeta OBLIGATORIA con tus imágenes
       ├── ocra.png
-      ├── yopuka.png
-      └── ...
+      ├── aniripsa.png
+      ├── panda.png
+      └── default.png
+```
+**Iconos Personalizables:** La carpeta `icons` está diseñada para poner cualquier imagen, idealmente en formato **.png** se puede personalizar al gusto del usuario.
+
+## Créditos y Autor
+
+> Este proyecto fue desarrollado por diversión con el objetivo de crear una alternativa **ligera** y específica a la función *Organizer* de [DofusGuide](https://dofusguide.fr/accueil). Aunque está ajustado a mis necesidades personales como jugador, siéntanse libres de clonar el repositorio y adaptar el código a sus propias necesidades.
+
+* **Desarrollador:** **Exil** (Juego en los servidores *Rafal* y *Talkasha*).
+* **Recursos Gráficos:** Los iconos utilizados en este proyecto fueron tomados de [E-bou - Galerie](https://api.e-bou.fr/img-browser), creada por [@Faareoh](https://x.com/Faareoh).
+
+## Licencia y Aviso Legal
+
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+**DofusSwitcher** es una herramienta segura:
+* No inyecta código.
+* No automatiza acciones (No es un bot).
+* Solo gestiona ventanas de Windows.
+
+> **Aviso:** El uso de software de terceros es responsabilidad exclusiva del usuario.
+
+
