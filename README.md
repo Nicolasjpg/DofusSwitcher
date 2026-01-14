@@ -20,12 +20,12 @@ Desarrollado en **Rust** utilizando `egui` y la API nativa de Windows para garan
 * Sistema Operativo: **Windows 10 o 11**
 ### Pasos
 1.  Ve a la sección de **[Releases](../../releases)** de este repositorio.
-2.  Descargue el archivo `.zip` de la última versión (ej: `DofusSwitcher_v1.0.zip`).
-3.  Descomprima el archivo
-4.  **IMPORTANTE:** ]Asegurar que la carpeta `icons` esté junto al ejecutable.
+2.  Descarga el archivo `.zip` de la última versión (ej: `DofusSwitcher_v1.0.zip`).
+3.  Descomprime el archivo
+4.  **IMPORTANTE:** ] Asegurarte que la carpeta `icons` esté junto al ejecutable.
 
 ### Estructura Correcta de la Carpeta
-Para que los iconos funcionen, lacarpeta debe verse así:
+Para que los iconos funcionen, la carpeta debe verse así:
 
 ```text
 📂 DofusSwitcher/
