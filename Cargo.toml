@@ -1,0 +1,28 @@
+[package]
+name = "DofusSwitcher"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+eframe = "0.29"
+lazy_static = "1.4"
+image = { version = "0.24", default-features = false, features = ["png", "jpeg"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+windows = { version = "0.52", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_System_Threading",
+    "Win32_System_ProcessStatus",
+] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[build-dependencies]
+winres = "0.1"

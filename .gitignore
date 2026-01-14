@@ -1,0 +1,17 @@
+
+/target/
+/debug/
+**/*.rs.bk
+Cargo.lock
+
+dofus_config.json
+icons_config.json
+
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+.DS_Store
+
+*.exe
+*.dll
