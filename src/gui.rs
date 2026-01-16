@@ -14,6 +14,7 @@ pub struct DofusApp {
     launch_texture: Option<egui::TextureHandle>,
     restore_texture: Option<egui::TextureHandle>,
     rotate_texture: Option<egui::TextureHandle>,
+    delete_texture: Option<egui::TextureHandle>,
     mini_mode: bool,
     vertical_mini: bool,
 }
@@ -29,6 +30,7 @@ impl Default for DofusApp {
             launch_texture: None,
             restore_texture: None,
             rotate_texture: None,
+            delete_texture: None,
             mini_mode: false,
             vertical_mini: true,
         }
@@ -65,6 +67,7 @@ impl DofusApp {
                                     "launch" => self.launch_texture = Some(texture),
                                     "restore" => self.restore_texture = Some(texture),
                                     "rotate" => self.rotate_texture = Some(texture),
+                                    "delete" => self.delete_texture = Some(texture),
                                     _ => {
                                         
                                         self.icon_textures.insert(filename.clone(), texture);
@@ -316,11 +319,13 @@ impl eframe::App for DofusApp {
             } else {
                 let mut source_idx = None;
                 let mut target_idx = None;
+                let mut delete_idx: Option<usize> = None;
 
                 let mut pending_icon_save: Option<(String, String)> = None;
 
                 egui::ScrollArea::vertical().show(ui, |ui| {
                         ui.set_width(ui.available_width());
+                        
                         for i in 0..len {
                             let win = &mut state.windows[i];
                             let item_id = ui.make_persistent_id(win.hwnd.0);
@@ -333,7 +338,6 @@ impl eframe::App for DofusApp {
                                 .show(ui, |ui| {
                                     let row_height = 36.0; 
                                     ui.set_height(row_height);
-                                    ui.set_min_height(row_height);
                                     
                                     ui.horizontal(|ui| {
                                         //drag handle
@@ -356,54 +360,94 @@ impl eframe::App for DofusApp {
                                             });
                                         });
 
-                                        let available_text_width = ui.available_width() - 45.0;
-                                        let column_width = available_text_width / 2.0;
+                                        ui.add_space(50.0);
+
+                                        let actions_width = 110.0;
+                                        let available_width = ui.available_width() - actions_width;                                        
+                                        let col_width = (available_width / 2.0) - 10.0; 
 
                                         //nombre pj
-                                        ui.allocate_ui_with_layout(egui::vec2(column_width, row_height), egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                                            ui.label(egui::RichText::new(&win.name).size(14.0).strong().color(egui::Color32::WHITE));
-                                        });
+                                        ui.allocate_ui_with_layout(
+                                            egui::vec2(col_width, row_height),
+                                            egui::Layout::left_to_right(egui::Align::Center), 
+                                            |ui| {
+                                                ui.set_min_width(col_width);
+                                                ui.add(egui::Label::new(
+                                                    egui::RichText::new(&win.name).size(14.0).strong().color(egui::Color32::WHITE)
+                                                ).truncate());
+                                            }
+                                        );
 
-                                        //clase pj
-                                        ui.allocate_ui_with_layout(egui::vec2(column_width, row_height), egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                                            ui.label(egui::RichText::new(&win.class).size(13.0).color(egui::Color32::from_rgb(200, 200, 200)));
-                                        });
+                                        //Clase pj
+                                        ui.allocate_ui_with_layout(
+                                            egui::vec2(col_width, row_height),
+                                            egui::Layout::left_to_right(egui::Align::Center), 
+                                            |ui| {
+                                                ui.set_min_width(col_width);
+                                                ui.add(egui::Label::new(
+                                                    egui::RichText::new(&win.class).size(13.0).color(egui::Color32::from_rgb(200, 200, 200))
+                                                ).truncate());
+                                            }
+                                        );
 
-                                        //boton de icon y popup
-                                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                            let tex = self.icon_textures.get(&win.icon).or_else(|| self.icon_textures.get("default"));
-                                            let btn_size = egui::vec2(28.0, 28.0);
-                                            let btn_resp = if let Some(t) = tex {
-                                                let img = egui::Image::new(t).fit_to_exact_size(btn_size);
-                                                ui.add(egui::ImageButton::new(img).frame(false))
-                                            } else {
-                                                ui.add_sized(btn_size, egui::Button::new("📷").small())
-                                            };
-                                            if btn_resp.hovered() { ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand); }
-                                            if btn_resp.clicked() { ui.memory_mut(|mem| mem.toggle_popup(popup_id)); }
+                                        //Acciones
+                                        ui.allocate_ui_with_layout(
+                                            egui::vec2(actions_width, row_height),
+                                            egui::Layout::right_to_left(egui::Align::Center), 
+                                            |ui| {
 
-                                            //popup de seleccion de icono
-                                            egui::popup::popup_below_widget(ui, popup_id, &btn_resp, egui::PopupCloseBehavior::CloseOnClick, |ui| {
-                                                egui::ScrollArea::vertical().max_height(250.0).show(ui, |ui| {
-                                                    egui::Grid::new(format!("grid_{}", i)).spacing(egui::vec2(6.0, 6.0)).show(ui, |ui| {
-                                                        let mut col_count = 0;
-                                                        for icon_name in &self.available_icon_names {
-                                                            if let Some(t) = self.icon_textures.get(icon_name) {
-                                                                let img_gal = egui::Image::new(t).fit_to_exact_size(egui::vec2(36.0, 36.0));
-                                                                
-                                                                if ui.add(egui::ImageButton::new(img_gal).frame(false)).clicked() {
-                                                                    win.icon = icon_name.to_string();                                                                    
-                                                                    pending_icon_save = Some((win.name.clone(), icon_name.to_string()));                                                                    
-                                                                    ui.memory_mut(|m| m.close_popup());
+                                                //eliminar fila
+                                                let del_btn = if let Some(tex) = &self.delete_texture {
+                                                    let img = egui::Image::new(tex).fit_to_exact_size(egui::vec2(18.0, 18.0));
+                                                    ui.add(egui::ImageButton::new(img).frame(false))
+                                                } else {
+                                                    ui.add(egui::Button::new("🗑").frame(false))
+                                                };
+                                                
+                                                if del_btn.on_hover_text("Ocultar ventana").clicked() {
+                                                    delete_idx = Some(i);
+                                                }
+                                                ui.add_space(20.0);
+
+                                                //icono
+                                                let tex = self.icon_textures.get(&win.icon).or_else(|| self.icon_textures.get("default"));
+                                                let btn_size = egui::vec2(30.0, 30.0);
+                                                
+                                                let btn_resp = if let Some(t) = tex {
+                                                    let img = egui::Image::new(t).fit_to_exact_size(btn_size);
+                                                    ui.add(egui::ImageButton::new(img).frame(false))
+                                                } else {
+                                                    ui.add_sized(btn_size, egui::Button::new("📷").small())
+                                                };
+                                                
+                                                if btn_resp.hovered() { ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand); }
+                                                if btn_resp.clicked() { ui.memory_mut(|mem| mem.toggle_popup(popup_id)); }
+                                                
+                                                //popup selección icono
+                                                egui::popup::popup_below_widget(ui, popup_id, &btn_resp, egui::PopupCloseBehavior::CloseOnClick, |ui| {
+                                                    egui::ScrollArea::vertical().max_height(250.0).show(ui, |ui| {
+                                                        egui::Grid::new(format!("grid_{}", i)).spacing(egui::vec2(6.0, 6.0)).show(ui, |ui| {
+                                                            let mut col_count = 0;
+                                                            for icon_name in &self.available_icon_names {
+                                                                if let Some(t) = self.icon_textures.get(icon_name) {
+                                                                    let img_gal = egui::Image::new(t).fit_to_exact_size(egui::vec2(36.0, 36.0));
+                                                                    if ui.add(egui::ImageButton::new(img_gal).frame(false)).clicked() {
+                                                                        win.icon = icon_name.to_string();
+                                                                        pending_icon_save = Some((win.name.clone(), icon_name.to_string()));
+                                                                        ui.memory_mut(|m| m.close_popup());
+                                                                    }
                                                                 }
+                                                                col_count += 1;
+                                                                if col_count >= 5 { ui.end_row(); col_count = 0; }
                                                             }
-                                                            col_count += 1;
-                                                            if col_count >= 5 { ui.end_row(); col_count = 0; }
-                                                        }
+                                                        });
                                                     });
-                                                });
-                                            });
-                                        });
+                                                });                                                
+                                                 
+
+                                                
+                                            }
+                                        );
                                     });
                                 });
                             ui.add_space(3.0);
@@ -413,7 +457,7 @@ impl eframe::App for DofusApp {
                     //'state' para guardar
                     if let Some((char_name, icon_name)) = pending_icon_save {
                         state.config.character_icons.insert(char_name, icon_name);
-                        state.save_config(); // Guardamos en disco sin error de borrow
+                        state.save_config();
                         self.status_msg = "Icono guardado.".to_string();
                     }
 
@@ -422,12 +466,11 @@ impl eframe::App for DofusApp {
                         if s != t { let item = state.windows.remove(s); state.windows.insert(t, item); }
                     }
 
-                if let (Some(source), Some(target)) = (source_idx, target_idx) {
-                    if source != target {
-                        let item = state.windows.remove(source);
-                        state.windows.insert(target, item);
+                    // Eliminar ventana
+                    if let Some(idx) = delete_idx {
+                        state.windows.remove(idx);
+                        self.status_msg = "Ventana eliminada.".to_string();
                     }
-                }
             }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Min), |ui| {
